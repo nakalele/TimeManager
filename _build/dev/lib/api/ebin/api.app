@@ -8,6 +8,7 @@
               {modules,['Elixir.Api','Elixir.Api.Accounts',
                         'Elixir.Api.Accounts.Clock',
                         'Elixir.Api.Accounts.User',
+                        'Elixir.Api.Accounts.User.RolesEnum',
                         'Elixir.Api.Accounts.Workingtime',
                         'Elixir.Api.Application',
                         'Elixir.Api.AuthErrorHandler','Elixir.Api.Guardian',

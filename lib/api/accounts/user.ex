@@ -1,9 +1,13 @@
 defmodule Api.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
-  @derive {Jason.Encoder, only: [:id, :email, :username, :firstname, :lastname]}
+  import EctoEnum
+  defenum RolesEnum, :role, [:employee, :manager, :admin]
+  @derive {Jason.Encoder, only: [:id, :email, :username, :firstname, :lastname, :role]}
 
 import Comeonin.Bcrypt, only: [hashpwsalt: 1]
+
+
 
   schema "users" do
     field :email, :string
@@ -11,6 +15,7 @@ import Comeonin.Bcrypt, only: [hashpwsalt: 1]
     field :firstname, :string
     field :lastname, :string
     field :password_hash, :string
+    field :role, RolesEnum
     has_many :workingtimes, Api.Accounts.Workingtime
     # Virtual fields:
     field :password, :string, virtual: true
@@ -19,16 +24,16 @@ import Comeonin.Bcrypt, only: [hashpwsalt: 1]
     timestamps()
   end
 
-  @required_fields ~w()
-  @required_fields ~w(email username firstname lastname password_hash)
+  #@required_fields ~w()
+  #@required_fields ~w(email username firstname lastname password_hash role)
 
 
 
   @doc false
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:email, :username, :password, :firstname, :lastname, :password_confirmation])
-    |> validate_required([:email, :username, :firstname, :lastname, :password, :password_confirmation])
+    |> cast(attrs, [:email, :username, :password, :firstname, :lastname, :password_confirmation, :role])
+    |> validate_required([:email, :username, :firstname, :lastname, :password, :password_confirmation, :role])
     |> validate_format(:email, ~r/@/) # Check that email is valid
     |> validate_length(:password, min: 8) # Check that password length is >= 8
     |> validate_confirmation(:password) # Check that password === password_confirmation
