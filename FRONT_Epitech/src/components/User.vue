@@ -12,7 +12,7 @@
             <b-form-input class="tm-form" id="input-large" size="lg" v-model="Users.user.email" placeholder="Email"/>
             <b-form-input class="tm-form" type="password" id="input-large" size="lg" v-model="Users.user.password" placeholder="Password"/>
             <b-form-input class="tm-form" type="password" id="input-large" size="lg" v-model="Users.user.password_confirmation" placeholder="Password Confirmation"/>
-            <b-button v-on:click="updateUser" class="tm-button btn btn-primary">Update</b-button>
+            <b-button v-on:click="updateUser" class="tm-button btn btn-primary">UPDATE</b-button>
         </div>
         <!-- <div class="jumbotron" id="get">
             <h3>Find a user</h3>
@@ -38,8 +38,8 @@
             <b-form-input type="password" v-model="Users.user.password" placeholder="Password"/>
             <b-button v-on:click="updateUser" class="btn btn-primary">Update</b-button>
         </div> -->
-        <div class="jumbotron" id="delete">
-            <b-button v-on:click="deleteUser" class="btn btn-primary">Delete Your account</b-button>
+        <div class="jumbotron text-center" id="delete">
+            <b-button v-on:click="deleteUser" class=" tm-button btn btn-primary">DELETE YOUR ACCOUNT</b-button>
         </div>
     </div>
 </template>
@@ -58,6 +58,7 @@ export default {
                     email: null,
                     password: null,
                     password_confirmation: null,
+                    role: null
                 }
             },
             response: {
@@ -95,7 +96,8 @@ export default {
                 axios
                     .delete('http://localhost:4000/api/users/' + this.response.id)
                     .then(response => {
-                        this.console.log(response);
+                        localStorage.removeItem('jwt');
+                        this.$router.push('login');
                     })
                     .catch(error => {
                         this.console.log(error);

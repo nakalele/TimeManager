@@ -31,11 +31,11 @@ defmodule Bcrypt.Stats do
 
   There are three options:
 
-    * log_rounds - the number of log rounds
+    * `:log_rounds` - the number of log rounds
       * the default is 12
-    * password - the password used
+    * `:password` - the password used
       * the default is "password"
-    * salt - the salt used
+    * `:salt` - the salt used
       * the default is the output of Bcrypt.gen_salt
   """
   def report(opts \\ []) do
@@ -43,18 +43,20 @@ defmodule Bcrypt.Stats do
     log_rounds = Keyword.get(opts, :log_rounds, 12)
     salt = Keyword.get(opts, :salt, Bcrypt.gen_salt(log_rounds))
     {exec_time, encoded} = :timer.tc(Bcrypt.Base, :hash_password, [password, salt])
+
     Bcrypt.verify_pass(password, encoded)
     |> format_result(encoded, exec_time)
   end
 
   defp format_result(check, encoded, exec_time) do
     log_rounds = String.slice(encoded, 4..5)
-    IO.puts """
+
+    IO.puts("""
     Hash:\t\t#{encoded}
     Log rounds:\t#{log_rounds}
     Time taken:\t#{format_time(exec_time)} seconds
     Verification #{if check, do: "OK", else: "FAILED"}
-    """
+    """)
   end
 
   defp format_time(time) do

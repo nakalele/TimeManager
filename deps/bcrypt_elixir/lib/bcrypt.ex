@@ -2,6 +2,10 @@ defmodule Bcrypt do
   @moduledoc """
   Bcrypt password hashing library main module.
 
+  This library can be used on its own, or it can be used together with
+  [Comeonin](https://hexdocs.pm/comeonin/api-reference.html), which
+  provides a higher-level api.
+
   For a lower-level API, see Bcrypt.Base.
 
   ## Bcrypt
@@ -24,11 +28,12 @@ defmodule Bcrypt do
 
   This option should only be used if you need to generate hashes that are
   then checked by older libraries.
+
+  The `$2y$` prefix is not supported. For advice on how to use hashes with the
+  `$2y$` prefix, see [this issue](https://github.com/riverrun/comeonin/issues/103).
   """
 
-  alias Bcrypt.{Base, Base64}
-
-  @log_rounds 12
+  alias Bcrypt.Base
 
   @doc """
   Generate a salt for use with the `Bcrypt.Base.hash_password` function.
@@ -41,28 +46,20 @@ defmodule Bcrypt do
   Only use this option if you need to generate hashes that are then checked
   by older libraries.
   """
-  def gen_salt(log_rounds \\ @log_rounds, legacy \\ false)
-  def gen_salt(log_rounds, _) when not is_integer(log_rounds) do
-    raise ArgumentError, "Wrong type - log_rounds should be an integer between 4 and 31"
-  end
-  def gen_salt(log_rounds, legacy) when log_rounds in 4..31 do
+  def gen_salt(log_rounds \\ 12, legacy \\ false) do
     :crypto.strong_rand_bytes(16)
-    |> :binary.bin_to_list
-    |> fmt_salt(zero_str(log_rounds), legacy)
+    |> Base.gensalt_nif(log_rounds, (legacy and 97) || 98)
   end
-  def gen_salt(log_rounds, legacy) when log_rounds < 4, do: gen_salt(4, legacy)
-  def gen_salt(log_rounds, legacy) when log_rounds > 31, do: gen_salt(31, legacy)
 
   @doc """
   Hash the password with a salt which is randomly generated.
 
   ## Configurable parameters
 
-  The following parameter can be set in the config file:
+  The following parameters can be set in the config file:
 
-    * log_rounds - computational cost
-      * the number of log rounds
-      * 12 (2^12 rounds) is the default
+    * `log_rounds` - the computational cost as number of log rounds, by default
+      it is 12 (2^12).
 
   If you are hashing passwords in your tests, it can be useful to add
   the following to the `config/test.exs` file:
@@ -77,13 +74,20 @@ defmodule Bcrypt do
   There is one option (this can be used if you want to override the
   value in the config):
 
-    * log_rounds - the number of log rounds
-      * the amount of computation, given in number of iterations
+    * `:log_rounds` - override the application's configured computational cost.
+    * `:legacy` - whether to generate a salt with the old `$2a$` prefix. This
+      should only be used to generate hashes that will be checked by older
+      libraries.
 
   """
   def hash_pwd_salt(password, opts \\ []) do
-    Base.hash_password(password, gen_salt(Keyword.get(
-      opts, :log_rounds, Application.get_env(:bcrypt_elixir, :log_rounds, 12))))
+    Base.hash_password(
+      password,
+      gen_salt(
+        Keyword.get(opts, :log_rounds, Application.get_env(:bcrypt_elixir, :log_rounds, 12)),
+        Keyword.get(opts, :legacy, false)
+      )
+    )
   end
 
   @doc """
@@ -91,11 +95,9 @@ defmodule Bcrypt do
 
   The check is performed in constant time to avoid timing attacks.
   """
-  def verify_pass(password, stored_hash) when is_binary(password) do
-    Base.verify_pass(password, stored_hash)
-  end
-  def verify_pass(_, _) do
-    raise ArgumentError, "Wrong type - the password should be a string"
+  def verify_pass(password, stored_hash) do
+    Base.checkpass_nif(:binary.bin_to_list(password), :binary.bin_to_list(stored_hash))
+    |> handle_verify
   end
 
   @doc """
@@ -110,10 +112,6 @@ defmodule Bcrypt do
     false
   end
 
-  defp zero_str(log_rounds) do
-    if log_rounds < 10, do: "0#{log_rounds}", else: "#{log_rounds}"
-  end
-
-  defp fmt_salt(salt, log_rounds, false), do: "$2b$#{log_rounds}$#{Base64.encode(salt)}"
-  defp fmt_salt(salt, log_rounds, true), do: "$2a$#{log_rounds}$#{Base64.encode(salt)}"
+  defp handle_verify(0), do: true
+  defp handle_verify(_), do: false
 end

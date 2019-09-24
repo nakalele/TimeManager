@@ -14,7 +14,27 @@ This library can be used on its own, or it can be used together
 with [Comeonin](https://hexdocs.pm/comeonin/api-reference.html),
 which provides a higher-level api.
 
+## Async tests issue
+
+Some developers have reported problems when running tests using `async: true`
+with version 1.0 of bcrypt_elixir. See this [issue](https://github.com/riverrun/bcrypt_elixir/issues/10)
+for more details.
+
 ## Installation
+
+1. Add bcrypt_elixir to the `deps` section of your mix.exs file:
+
+If you are using Erlang 20:
+
+```elixir
+def deps do
+  [
+    {:bcrypt_elixir, "~> 1.0"}
+  ]
+end
+```
+
+If you are NOT using Erlang 20:
 
 ```elixir
 def deps do
@@ -24,8 +44,16 @@ def deps do
 end
 ```
 
-You also need to have a C compiler installed to run bcrypt_elixir.
+2. Make sure you have a C compiler installed.
 See the [Comeonin wiki](https://github.com/riverrun/comeonin/wiki) for details.
+
+3. Optional: during tests (and tests only), you may want to reduce the number of rounds
+so it does not slow down your test suite. If you have a config/test.exs, you should
+add:
+
+```elixir
+config :bcrypt_elixir, :log_rounds, 4
+```
 
 ## Use
 
@@ -38,6 +66,13 @@ In most cases, you will just need to use the following three functions:
 See the documentation for the Bcrypt module for more information.
 
 For a lower-level api, see the documentation for Bcrypt.Base.
+
+For further information about password hashing and using Bcrypt with Comeonin,
+see the Comeonin [wiki](https://github.com/riverrun/comeonin/wiki).
+
+## Deployment
+
+See the Comeonin [deployment guide](https://github.com/riverrun/comeonin/wiki/Deployment).
 
 ### License
 

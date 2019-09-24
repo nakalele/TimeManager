@@ -34,11 +34,11 @@ defmodule ApiWeb.Router do
 
   scope "/sign_up"do
     post "/", UserController, :create
- end
+  end
 
- scope "/sign_in"do
+  scope "/sign_in"do
     post "/", UserController, :sign_in
-end
+  end
 
 
 

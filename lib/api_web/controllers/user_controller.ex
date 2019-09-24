@@ -26,7 +26,7 @@ defmodule ApiWeb.UserController do
   def create(conn, %{"user" => user_params}) do
     with {:ok, %User{} = user} <- Accounts.create_user(user_params),
          {:ok, token, _claims} <- Guardian.encode_and_sign(user) do
-      conn |> render("user.json", user: user)
+      conn |> render("jwt.json", jwt: token)
     end
   end
 

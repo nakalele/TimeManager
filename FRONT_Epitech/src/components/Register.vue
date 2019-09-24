@@ -14,10 +14,7 @@
 </template>
 
 <script>
-import VueJwtDecode from 'vue-jwt-decode'
-import Vue from 'vue'
-import VueRouter from 'vue-router'
-Vue.use(VueRouter)
+
 export default {
     name: "User",
     data() {
@@ -28,6 +25,7 @@ export default {
                     username: null,
                     firstname: null,
                     lastname: null,
+                    role: "employee",
                     password: null,
                     password_confirmation: null,
                 },
@@ -49,7 +47,6 @@ export default {
                 axios.post('http://localhost:4000/api/sign_up', this.Users)
                     .then(response => {
                         localStorage.setItem('jwt', response.data.jwt);
-                        var test = VueJwtDecode.decode(localStorage.getItem('jwt'));
                         this.getUser();
                     })
                     .catch(error => {

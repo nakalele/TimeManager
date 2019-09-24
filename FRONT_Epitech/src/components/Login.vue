@@ -4,7 +4,7 @@
             <h1>Login</h1>
             <b-form-input class="tm-form" id="input-large" size="lg" type="email" v-model="Users.user.email" placeholder="Email"/>
             <b-form-input class="tm-form" type="password" v-model="Users.user.password" placeholder="Password"/>
-            <b-button v-on:click="getUser" class="tm-button btn btn-primary">Login</b-button>
+            <b-button v-on:click="login" class="tm-button btn btn-primary">Login</b-button>
         </div>
     </div>
 </template>
@@ -21,18 +21,24 @@ export default {
                     password: null,
                 },
             },
-            response: {
-                    jwt: null,
-            }
         }
     },
     methods: {
             getUser() {
-                axios.post('http://localhost:4000/api/sign_in', this.Users, { headers: {'Accept': 'application/json', 'Content-Type': 'text/plain'}})
+                axios.get('http://localhost:4000/api/my_user', { headers: {'Authorization': 'Bearer ' + localStorage.getItem('jwt')}})
                     .then(response => {
                         console.log(response);
-                        localStorage.setItem('jwt', response.data.data.jwt);
-                        this.response.jwt = response.data.data.jwt;
+                        this.$router.push('user');
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    })
+            },
+            login() {
+                axios.post('http://localhost:4000/api/sign_in', this.Users.user)
+                    .then(response => {
+                        localStorage.setItem('jwt', response.data.jwt);
+                        this.getUser();
                     })
                     .catch(error => {
                         console.log(error)
