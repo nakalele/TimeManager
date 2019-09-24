@@ -5,8 +5,9 @@ defmodule Api.Accounts.Workingtime do
   schema "workingtimes" do
     field :end, :naive_datetime
     field :start, :naive_datetime
-   #field :user, :id
-   #belongs_to :user, Api.Accounts.User
+    field :total_hours, :naive_datetime
+    field :user, :id
+    belongs_to :clock, Api.Accounts.User
     timestamps()
   end
 

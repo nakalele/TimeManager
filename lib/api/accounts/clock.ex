@@ -6,6 +6,8 @@ defmodule Api.Accounts.Clock do
     field :status, :boolean, default: false
     field :time, :naive_datetime
     field :user, :id
+    field :departure, :naive_datetime
+    field :arrival, :naive_datetime
 
     timestamps()
   end
