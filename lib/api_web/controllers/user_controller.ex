@@ -14,6 +14,11 @@ defmodule ApiWeb.UserController do
     render(conn, "index.json", users: users)
   end
 
+  def show_user(conn, %{"userID" => id}) do
+    user = Accounts.get_user!(id)
+    render(conn, "user.json", user: user)
+  end
+
   def sign_in(conn, %{"email" => email, "password" => password}) do
     case Accounts.token_sign_in(email, password) do
       {:ok, token, _claims} ->
@@ -38,6 +43,11 @@ defmodule ApiWeb.UserController do
       user = Accounts.get_user_by_email!(Map.get(params, "email"), Map.get(params, "username")) # get the user by attributes
       render(conn, "show.json", user: user)
     end
+  end
+
+  def show_all(conn, _params) do
+    users = Accounts.list_users()
+    render(conn, "index.json", users: users)
   end
 
   def show(conn, _params) do

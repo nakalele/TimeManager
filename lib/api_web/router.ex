@@ -41,15 +41,12 @@ defmodule ApiWeb.Router do
   end
 
 
-
-
     scope "/users" do
-      get "/", UserController, :show_by_email
-      get "/:userID", UserController, :show
+      get "/:userID", UserController, :show_user
+      get "/", UserController, :show_all
       post "/", UserController, :create
       put "/:userID", UserController, :update
       delete "/:userID", UserController, :delete
-      get "/", UserController, :show
     end
 
     scope "/workingtimes" do
