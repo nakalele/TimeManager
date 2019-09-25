@@ -1,11 +1,12 @@
 <template>
     <div class="container">
         <div class="jumbotron text-center" id="display">
-            <h2>Hi {{response.username}}</h2>
+            <h1>Hi {{response.username}}</h1>
             <h3>This is your personal informations. Feel free to change them</h3>
-            <h3>firstname {{response.firstname}}</h3>
-            <h3>lastname: {{response.lastname}}</h3>
-            <h3>email: {{response.email}}</h3>
+            <h2>Role: {{response.role}}</h2>
+            <h2>firstname: {{response.firstname}}</h2>
+            <h2>lastname: {{response.lastname}}</h2>
+            <h2>email: {{response.email}}</h2>
             <b-form-input class="tm-form" id="input-large" size="lg" v-model="Users.user.firstname" placeholder="Firstname"/>
             <b-form-input class="tm-form" id="input-large" size="lg" v-model="Users.user.lastname" placeholder="Lastname"/>
             <b-form-input class="tm-form" id="input-large" size="lg" v-model="Users.user.username" placeholder="Username"/>
@@ -13,6 +14,26 @@
             <b-form-input class="tm-form" type="password" id="input-large" size="lg" v-model="Users.user.password" placeholder="Password"/>
             <b-form-input class="tm-form" type="password" id="input-large" size="lg" v-model="Users.user.password_confirmation" placeholder="Password Confirmation"/>
             <b-button v-on:click="updateUser" class="tm-button btn btn-primary">UPDATE</b-button>
+        </div>
+        <div class="jumbotron text-center" id="clock">
+            <h1> Add your Working Time of the day</h1>
+            <b-form-input class="tm-form" id="start input-large" size="lg" type="date" v-model="tmpdate" />
+            <b-form-input v-model="workingtimes.clock.time" class="tm-form" id="start input-large" size="lg" type="time"></b-form-input>
+            <label class="time" for="start">Start Time</label>
+            <b-form-input v-model="workingtimes.clock.departure" class="tm-form" id="start input-large" size="lg" type="time"></b-form-input>
+            <label class="time" for="end">End Time</label>
+            <b-form-input v-model="workingtimes.clock.arrival" class="tm-form" id="end input-large" size="lg" type="time"></b-form-input>
+            <b-button v-on:click="saveTime" class="tm-button btn btn-primary">SAVE WORKING TIME</b-button>
+        </div>
+        <div v-if="response.role === 'admin'" class="jumbotron text-center" id="admin">
+            <div v-if="response.role === 'manager'" class="jumbotron text-center" id="manager">
+                <!-- <div v-for="user in allusers">
+                    <button v-onclick="manageUser(user.id)">{{user.name}}</button>
+                </div> -->
+            </div>
+            <div v-for="user in allusers" v-bind:key="user.id">
+                <b-button class="tm-button btn btn-primary" v-on:click="promoteUser(user.id)">{{user.username}}</b-button>
+            </div>
         </div>
         <!-- <div class="jumbotron" id="get">
             <h3>Find a user</h3>
@@ -67,23 +88,85 @@ export default {
                 lastname: null,
                 email: null,
                 username: null,
-            }
+                role: null
+            },
+            usermanage: {
+                id: null,
+                firstname: null,
+                lastname: null,
+            },
+            allusers: [],
+            workingtimes: {
+                clock: {
+                    status: true,
+                    time: null,
+                    userID: null,
+                    departure: null,
+                    arrival: null
+                }
+            },
+            tmpdate: "",
         }
     },
     methods: {
-            getUser() {
-                axios.get('http://localhost:4000/api/my_user', { headers: {'Authorization': 'Bearer ' + localStorage.getItem('jwt')}})
+            saveTime() {
+                this.workingtimes.clock.time = this.tmpdate + " " + this.workingtimes.clock.time;
+                this.workingtimes.clock.departure = this.tmpdate + " " + this.workingtimes.clock.departure;
+                this.workingtimes.clock.arrival = this.tmpdate + " " + this.workingtimes.clock.arrival;
+                
+                axios.post('http://localhost:4000/api/clocks/' + this.workingtimes.clock.userID, this.workingtimes)
                     .then(response => {
-                        this.response = response.data;
                         console.log(response);
                     })
                     .catch(error => {
                         console.log(error);
                     })
             },
+            manageUser(id) {
+
+            },
+            promoteUser(id) {
+                console.log(id);
+                const user = {
+                    user: {
+                        role: "manager"
+                    }
+                }
+                axios.put('http://localhost:4000/api/users/' + id, user)
+                    .then(response =>{
+                        console.log(response);
+                    })
+                    .catch(error => {
+                        console.log(error)
+                    })
+            },
+            getUsers() {
+                axios.get('http://localhost:4000/api/users')
+                    .then(response => {
+                        console.log(response);
+                        this.allusers = response.data.data;
+                        console.log(this.allusers[0].username);
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    })
+            },
+            getUser() {
+                axios.get('http://localhost:4000/api/my_user', { headers: {'Authorization': 'Bearer ' + localStorage.getItem('jwt')}})
+                    .then(response => {
+                        this.response = response.data;
+                        this.workingtimes.clock.userID = response.data.id;
+                        console.log(response);
+                        if (response.data.role == "admin" || response.data.role == "employee") {
+                            this.getUsers()
+                        }
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    })
+            },
             updateUser() {
-                axios
-                    .put('http://localhost:4000/api/users/' + this.response.id, this.Users)
+                axios.put('http://localhost:4000/api/users/' + this.response.id, this.Users)
                     .then(response => {
                         console.log(response);
                         this.getUser();
@@ -120,6 +203,12 @@ export default {
 
 .tm-button {
     margin-top: 2%;
+}
+
+.time {
+    font-size: 15px;
+    margin: 1.2% -10%;
+    position: absolute;
 }
 
 </style>

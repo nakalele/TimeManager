@@ -30,6 +30,16 @@ defmodule ApiWeb.UserController do
     end
   end
 
+  def show_id(conn, %{"userID" => id}) do
+    user = Accounts.get_user!(id)
+    render(conn, "user.json", user: user)
+  end
+
+  def show_all(conn, _params) do
+    users = Accounts.list_users()
+    render(conn, "index.json", users: users)
+  end
+
   def show_by_email(conn, %{}) do
     params = conn.query_params
 

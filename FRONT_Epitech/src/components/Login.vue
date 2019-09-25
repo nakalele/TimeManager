@@ -3,7 +3,7 @@
         <div class="jumbotron text-center" id="get">
             <h1>Login</h1>
             <b-form-input class="tm-form" id="input-large" size="lg" type="email" v-model="Users.user.email" placeholder="Email"/>
-            <b-form-input class="tm-form" type="password" v-model="Users.user.password" placeholder="Password"/>
+            <b-form-input class="tm-form" id="input-large" size="lg" type="password" v-model="Users.user.password" placeholder="Password"/>
             <b-button v-on:click="login" class="tm-button btn btn-primary">Login</b-button>
         </div>
     </div>
