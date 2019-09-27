@@ -27,14 +27,26 @@
             <b-form-input v-model="workingtimes.workingtime.end" class="tm-form" id="end input-large" size="lg" type="time"></b-form-input>
             <b-button v-on:click="saveTime" class="tm-button btn btn-primary">SAVE WORKING TIME</b-button>
         </div>
-        <div v-if="response.role === 'admin'" class="jumbotron text-center" id="admin">
+        <div v-if="response.role === 'admin'" id="admin">
             <div v-if="response.role === 'manager'" class="jumbotron text-center" id="manager">
                 <!-- <div v-for="user in allusers">
                     <button v-onclick="manageUser(user.id)">{{user.name}}</button>
                 </div> -->
             </div>
-            <div v-for="user in allusers" v-bind:key="user.id">
-                <b-button class="tm-button btn btn-primary" v-on:click="promoteUser(user.id)">{{user.username}}</b-button>
+            <div class="jumbotron text-center">
+                <line-chart :data="this.tmpuserwt"></line-chart>
+                <div class="flex-row listuser">
+                    <div v-for="user in allusers" v-bind:key="user.id">
+                        <b-button class="tm-button btn btn-primary" v-on:click="manageUser(user.id)">{{user.username}}</b-button>
+                    </div>
+                </div>
+            </div>
+            <div class="jumbotron text-center">
+                <div class="flex-row listuser">     
+                    <div v-for="user in allusers" v-bind:key="user.id">
+                        <b-button class="tm-button btn btn-primary" v-on:click="promoteUser(user.id)">{{user.username}}</b-button>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="jumbotron text-center" id="delete">
@@ -94,6 +106,7 @@ export default {
             allwt: [],
             userswt: {},
             dateswt: [],
+            tmpuserwt: {}
         }
     },
     methods: {
@@ -138,7 +151,15 @@ export default {
                     })
             },
             manageUser(id) {
-
+                const tmp = {};
+                var index = 0;
+                while (index < this.allwt.length) {
+                    if (this.allwt[index].id == id) {
+                        tmp[this.allwt[index].date] = this.allwt[index].total;
+                    }
+                    index++;
+                }
+                this.tmpuserwt = tmp;
             },
             promoteUser(id) {
                 console.log(id);
@@ -173,7 +194,7 @@ export default {
                         this.workingtimes.workingtime.user = response.data.id;
                         console.log(response);
                         this.getWorkingTimes();
-                        if (response.data.role == "admin" || response.data.role == "employee") {
+                        if (response.data.role == "admin" || response.data.role == "manager") {
                             this.getUsers()
                         }
                     })
@@ -227,4 +248,13 @@ export default {
     position: absolute;
 }
 
+.flex-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.listuser {
+    margin-top: 5%;
+}
 </style>
