@@ -37,30 +37,6 @@
                 <b-button class="tm-button btn btn-primary" v-on:click="promoteUser(user.id)">{{user.username}}</b-button>
             </div>
         </div>
-        <!-- <div class="jumbotron" id="get">
-            <h3>Find a user</h3>
-            <b-form-input v-model="Users.user.id" placeholder="Id"/>
-            <b-button v-on:click="getUser" class="btn btn-primary">Get</b-button>
-        </div>
-        <div class="jumbotron" id="create">
-            <h3>Add a user</h3>
-            <b-form-input v-model="Users.user.username" placeholder="Firstname"/>
-            <b-form-input v-model="Users.user.username" placeholder="Lastname"/>
-            <b-form-input v-model="Users.user.username" placeholder="Username"/>
-            <b-form-input v-model="Users.user.email" placeholder="Email"/>
-            <b-form-input type="password" v-model="Users.user.password" placeholder="Password"/>
-            <b-button v-on:click="createUser" class="btn btn-primary">Create</b-button>
-        </div>
-        <div class="jumbotron" id="update">
-            <h3>Update a user</h3>
-            <b-form-input v-model="Users.user.id" placeholder="Id"/>
-            <b-form-input v-model="Users.user.username" placeholder="Firstname"/>
-            <b-form-input v-model="Users.user.username" placeholder="Lastname"/>
-            <b-form-input v-model="Users.user.username" placeholder="Username"/>
-            <b-form-input v-model="Users.user.email" placeholder="Email"/>
-            <b-form-input type="password" v-model="Users.user.password" placeholder="Password"/>
-            <b-button v-on:click="updateUser" class="btn btn-primary">Update</b-button>
-        </div> -->
         <div class="jumbotron text-center" id="delete">
             <b-button v-on:click="deleteUser" class=" tm-button btn btn-primary">DELETE YOUR ACCOUNT</b-button>
         </div>
@@ -147,6 +123,15 @@ export default {
                     .then(response => {
                         console.log(response);
                         this.getWorkingTimes();
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    })
+            },
+            getUserbyID(id) {
+                axios.get('http://localhost:4000/api/users' + id)
+                    .then(response => {
+                        console.log(response);
                     })
                     .catch(error => {
                         console.log(error);
