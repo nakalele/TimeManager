@@ -52,6 +52,7 @@ defmodule ApiWeb.Router do
     end
 
     scope "/workingtimes" do
+      get "/", WorkingtimeController, :show_all
       get "/:userID",WorkingtimeController , :show
       get "/:userID/:workingtimeID", WorkingtimeController, :showId
       post "/:userID", WorkingtimeController, :create

@@ -1,5 +1,8 @@
 <template>
     <div class="container">
+        <div class="jumbotron text-center" id="graph">
+            <line-chart :data="this.userswt"></line-chart>
+        </div>
         <div class="jumbotron text-center" id="display">
             <h1>Hi {{response.username}}</h1>
             <h3>This is your personal informations. Feel free to change them</h3>
@@ -15,14 +18,13 @@
             <b-form-input class="tm-form" type="password" id="input-large" size="lg" v-model="Users.user.password_confirmation" placeholder="Password Confirmation"/>
             <b-button v-on:click="updateUser" class="tm-button btn btn-primary">UPDATE</b-button>
         </div>
-        <div class="jumbotron text-center" id="clock">
+        <div class="jumbotron text-center" id="workingtime">
             <h1> Add your Working Time of the day</h1>
-            <b-form-input class="tm-form" id="start input-large" size="lg" type="date" v-model="tmpdate" />
-            <b-form-input v-model="workingtimes.clock.time" class="tm-form" id="start input-large" size="lg" type="time"></b-form-input>
+            <b-form-input class="tm-form" id="start input-large" size="lg" type="date" v-model="workingtimes.workingtime.date" />
             <label class="time" for="start">Start Time</label>
-            <b-form-input v-model="workingtimes.clock.departure" class="tm-form" id="start input-large" size="lg" type="time"></b-form-input>
+            <b-form-input v-model="workingtimes.workingtime.start" class="tm-form" id="start input-large" size="lg" type="time"></b-form-input>
             <label class="time" for="end">End Time</label>
-            <b-form-input v-model="workingtimes.clock.arrival" class="tm-form" id="end input-large" size="lg" type="time"></b-form-input>
+            <b-form-input v-model="workingtimes.workingtime.end" class="tm-form" id="end input-large" size="lg" type="time"></b-form-input>
             <b-button v-on:click="saveTime" class="tm-button btn btn-primary">SAVE WORKING TIME</b-button>
         </div>
         <div v-if="response.role === 'admin'" class="jumbotron text-center" id="admin">
@@ -66,9 +68,17 @@
 </template>
 
 <script>
+import moment from 'moment';
+import Vue from 'vue'
+import Chartkick from 'vue-chartkick'
+import Chart from 'chart.js'
 
+Vue.use(Chartkick.use(Chart))
 export default {
     name: "User",
+    components: {
+        highcharts: Chart
+      },
     data() {
         return {
             Users: {
@@ -97,26 +107,46 @@ export default {
             },
             allusers: [],
             workingtimes: {
-                clock: {
-                    status: true,
-                    time: null,
-                    userID: null,
-                    departure: null,
-                    arrival: null
+                workingtime: {
+                    start: null,
+                    end: null,
+                    date: null,
+                    total: null,
+                    user: null,  
                 }
             },
-            tmpdate: "",
+            allwt: [],
+            userswt: {},
+            dateswt: [],
         }
     },
     methods: {
+            getWorkingTimes() {
+                axios.get('http://localhost:4000/api/workingtimes/')
+                    .then(response => {
+                        this.allwt = response.data.data;
+                        const tmp = {}
+                        console.log(this.allwt.length);
+                        var index = 0;
+                        while (index < this.allwt.length) {
+                            if (this.allwt[index].id == this.response.id) {
+                                tmp[this.allwt[index].date] = this.allwt[index].total;
+                            }
+                            index++;
+                        }
+                        this.userswt = tmp;
+                        console.log(this.userswt);
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    })
+            },
             saveTime() {
-                this.workingtimes.clock.time = this.tmpdate + " " + this.workingtimes.clock.time;
-                this.workingtimes.clock.departure = this.tmpdate + " " + this.workingtimes.clock.departure;
-                this.workingtimes.clock.arrival = this.tmpdate + " " + this.workingtimes.clock.arrival;
-                
-                axios.post('http://localhost:4000/api/clocks/' + this.workingtimes.clock.userID, this.workingtimes)
+                this.workingtimes.workingtime.total = moment.utc(moment(this.workingtimes.workingtime.end, "HH:mm").diff(moment(this.workingtimes.workingtime.start, "HH:mm"))).format("HH:mm")
+                axios.post('http://localhost:4000/api/workingtimes/' + this.workingtimes.workingtime.user, this.workingtimes)
                     .then(response => {
                         console.log(response);
+                        this.getWorkingTimes();
                     })
                     .catch(error => {
                         console.log(error);
@@ -132,7 +162,7 @@ export default {
                         role: "manager"
                     }
                 }
-                axios.put('http://localhost:4000/api/users/' + id, user)
+                axios.put('http://localhost:4000/api/users/role/' + id, user)
                     .then(response =>{
                         console.log(response);
                     })
@@ -155,8 +185,9 @@ export default {
                 axios.get('http://localhost:4000/api/my_user', { headers: {'Authorization': 'Bearer ' + localStorage.getItem('jwt')}})
                     .then(response => {
                         this.response = response.data;
-                        this.workingtimes.clock.userID = response.data.id;
+                        this.workingtimes.workingtime.user = response.data.id;
                         console.log(response);
+                        this.getWorkingTimes();
                         if (response.data.role == "admin" || response.data.role == "employee") {
                             this.getUsers()
                         }

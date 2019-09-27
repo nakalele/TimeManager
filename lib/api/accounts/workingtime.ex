@@ -3,17 +3,18 @@ defmodule Api.Accounts.Workingtime do
   import Ecto.Changeset
 
   schema "workingtimes" do
-    field :end, :naive_datetime
-    field :start, :naive_datetime
-   #field :user, :id
-   #belongs_to :user, Api.Accounts.User
+    field :end, :time
+    field :start, :time
+    field :date, :date
+    field :total, :time
+    field :user, :id
     timestamps()
   end
 
   @doc false
   def changeset(workingtime, attrs) do
     workingtime
-    |> cast(attrs, [:start, :end])
-    |> validate_required([:start, :end])
+    |> cast(attrs, [:start, :end, :date, :total, :user])
+    |> validate_required([:start, :end, :date, :total, :user])
   end
 end
