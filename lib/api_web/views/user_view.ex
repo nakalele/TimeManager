@@ -16,7 +16,8 @@ defmodule ApiWeb.UserView do
       email: user.email,
       firstname: user.firstname,
       lastname: user.lastname,
-      role: user.role
+      role: user.role,
+      teams: user.teams
     }
   end
   def render("jwt.json", %{jwt: jwt}) do

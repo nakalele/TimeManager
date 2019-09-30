@@ -8,14 +8,14 @@ defmodule Api.Accounts.Workingtime do
     field :date, :date
     field :total, :time
     field :user, :id
-    field :teams, :string
+    field :teams, :integer
     timestamps()
   end
 
   @doc false
   def changeset(workingtime, attrs) do
     workingtime
-    |> cast(attrs, [:start, :end, :date, :total, :user])
-    |> validate_required([:start, :end, :date, :total, :user])
+    |> cast(attrs, [:start, :end, :date, :total, :user, :teams])
+    |> validate_required([:start, :end, :date, :total, :user, :teams])
   end
 end

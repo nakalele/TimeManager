@@ -3,7 +3,7 @@ defmodule Api.Accounts.User do
   import Ecto.Changeset
   import EctoEnum
   defenum RolesEnum, :role, [:employee, :manager, :admin]
-  @derive {Jason.Encoder, only: [:id, :email, :username, :firstname, :lastname, :role]}
+  @derive {Jason.Encoder, only: [:id, :email, :username, :firstname, :lastname, :role, :teams]}
 
 import Comeonin.Bcrypt, only: [hashpwsalt: 1]
 
@@ -16,7 +16,7 @@ import Comeonin.Bcrypt, only: [hashpwsalt: 1]
     field :lastname, :string
     field :password_hash, :string
     field :role, RolesEnum
-    field :teams, :string
+    field :teams, :integer
     has_many :workingtimes, Api.Accounts.Workingtime
     # Virtual fields:
     field :password, :string, virtual: true
@@ -33,8 +33,8 @@ import Comeonin.Bcrypt, only: [hashpwsalt: 1]
   @doc false
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:email, :username, :password, :firstname, :lastname, :password_confirmation, :role])
-    |> validate_required([:email, :username, :firstname, :lastname, :password, :password_confirmation, :role])
+    |> cast(attrs, [:email, :username, :password, :firstname, :lastname, :password_confirmation, :role, :teams])
+    |> validate_required([:email, :username, :firstname, :lastname, :password, :password_confirmation, :role, :teams])
     |> validate_format(:email, ~r/@/) # Check that email is valid
     |> validate_length(:password, min: 8) # Check that password length is >= 8
     |> validate_confirmation(:password) # Check that password === password_confirmation

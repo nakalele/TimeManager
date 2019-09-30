@@ -28,6 +28,7 @@ export default {
                     role: "employee",
                     password: null,
                     password_confirmation: null,
+                    teams: 0
                 },
             }
         }

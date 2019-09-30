@@ -5,8 +5,8 @@
         <b-navbar-brand class="tm-title">Time Manager</b-navbar-brand>
         <b-collapse id="nav-text-collapse" is-nav>
           <b-navbar-nav class="ml-auto">
-            <b-nav-item class="tm-button" to="/register">Sign Up</b-nav-item>
-            <b-nav-item class="tm-button" to="/login">Sign In</b-nav-item>
+            <b-nav-item class="app-button" to="/register">Sign Up</b-nav-item>
+            <b-nav-item class="app-button" to="/login">Sign In</b-nav-item>
           </b-navbar-nav>
         </b-collapse>
       </b-navbar>
@@ -39,7 +39,7 @@ export default {
 
 <style>
 
-.tm-button {
+.app-button {
   font-size: 2rem !important;
 }
 

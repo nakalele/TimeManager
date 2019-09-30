@@ -15,6 +15,7 @@ defmodule ApiWeb.WorkingtimeView do
       start: workingtime.start,
       end: workingtime.end,
       total: workingtime.total,
-      date: workingtime.date}
+      date: workingtime.date,
+      teams: workingtime.teams}
   end
 end
