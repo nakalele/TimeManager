@@ -8,6 +8,7 @@ defmodule Api.Accounts.Workingtime do
     field :date, :date
     field :total, :time
     field :user, :id
+    field :teams, :string
     timestamps()
   end
 

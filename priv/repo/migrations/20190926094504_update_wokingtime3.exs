@@ -7,6 +7,7 @@ defmodule Api.Repo.Migrations.UpdateWokingtime3 do
       remove :end, :naive_datetime
       add :start, :time
       add :end, :time
+      add :teams, :int
     end
   end
 end

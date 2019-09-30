@@ -16,6 +16,7 @@ import Comeonin.Bcrypt, only: [hashpwsalt: 1]
     field :lastname, :string
     field :password_hash, :string
     field :role, RolesEnum
+    field :teams, :string
     has_many :workingtimes, Api.Accounts.Workingtime
     # Virtual fields:
     field :password, :string, virtual: true
@@ -24,8 +25,8 @@ import Comeonin.Bcrypt, only: [hashpwsalt: 1]
     timestamps()
   end
 
-  #@required_fields ~w()
-  #@required_fields ~w(email username firstname lastname password_hash role)
+  @required_fields ~w()
+  @required_fields ~w(email username firstname lastname password_hash role)
 
 
 
@@ -50,3 +51,4 @@ import Comeonin.Bcrypt, only: [hashpwsalt: 1]
    end
  end
 end
+
